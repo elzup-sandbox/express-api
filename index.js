@@ -1,22 +1,24 @@
 const express = require('express')
-const bodyParser = require('body-parser')
+// const bodyParser = require('body-parser')
 
 const app = express()
-app.use(bodyParser())
+app.use(function (req, res, next) {
+	var data = ''
+	req.on('data', function (chunk) {
+		data += chunk
+	})
+	req.on('end', function () {
+		req.rawBody = data
+		next()
+	})
+})
 
 app.post('/path', (req, res) => {
-	console.log(req.body)
+	console.log('headers')
+	console.log(req.headers)
+	console.log('body')
+	console.log(req.rawBody)
 
-	if (req.body.invalid) {
-		res.status(400)
-		res.send({
-			status: 400,
-			message: '不正なリクエストです',
-			details: 'this is details message',
-		})
-
-		return
-	}
 	res.send({
 		status: 200,
 		message: 'OK',
